@@ -56,6 +56,10 @@ npm run db:setup      # migrate + seed (run automatically by predev/prebuild)
 > [!NOTE]
 > Seeding is idempotent — it skips games that already exist (matched by title) rather than reconciling changed rows. CI always starts from a clean database, so it reflects `games.csv` exactly. Locally, if you edit or remove rows in `games.csv`, delete `tailspin.db` and re-run `npm run db:setup` to fully regenerate.
 
+## Accessibility
+
+The shared header includes a high-contrast mode toggle. The preference is stored in `localStorage` and restored before the page renders, so it remains active across reloads and navigation. High-contrast mode uses a black-and-white palette with a yellow focus outline to improve readability and keyboard focus visibility.
+
 ## Running tests
 
 ```bash

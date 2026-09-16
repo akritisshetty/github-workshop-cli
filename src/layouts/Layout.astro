@@ -17,6 +17,11 @@ const { title = "Tailspin Toys" } = Astro.props;
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
+        <script is:inline>
+            if (window.localStorage.getItem('tailspin-high-contrast') === 'true') {
+                document.documentElement.classList.add('high-contrast');
+            }
+        </script>
         <!-- Preconnect to improve font loading -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,6 +45,53 @@ const { title = "Tailspin Toys" } = Astro.props;
     html {
         font-family: var(--font-sans);
         scroll-behavior: smooth;
+    }
+
+    html.high-contrast {
+        color-scheme: dark;
+    }
+
+    html.high-contrast body {
+        background-color: #000 !important;
+        color: #fff !important;
+    }
+
+    html.high-contrast header,
+    html.high-contrast nav,
+    html.high-contrast [data-testid="game-filters"],
+    html.high-contrast [data-testid="game-card"] {
+        background-color: #000 !important;
+        border-color: #fff !important;
+    }
+
+    html.high-contrast a,
+    html.high-contrast button,
+    html.high-contrast label,
+    html.high-contrast legend,
+    html.high-contrast h1,
+    html.high-contrast h2,
+    html.high-contrast h3,
+    html.high-contrast p,
+    html.high-contrast span,
+    html.high-contrast input,
+    html.high-contrast select,
+    html.high-contrast option {
+        color: #fff !important;
+    }
+
+    html.high-contrast input,
+    html.high-contrast select,
+    html.high-contrast button {
+        background-color: #000 !important;
+        border-color: #fff !important;
+    }
+
+    html.high-contrast a:focus-visible,
+    html.high-contrast button:focus-visible,
+    html.high-contrast input:focus-visible,
+    html.high-contrast select:focus-visible {
+        outline: 3px solid #ff0 !important;
+        outline-offset: 2px;
     }
     
     body {
