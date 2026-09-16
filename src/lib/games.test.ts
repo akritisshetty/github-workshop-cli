@@ -6,6 +6,7 @@ import {
     getAllGames,
     getAllGameIds,
     getGameById,
+    getFilteredGames,
 } from './games';
 
 async function seedGames(db: Database, count: number): Promise<void> {
@@ -28,6 +29,49 @@ async function seedGames(db: Database, count: number): Promise<void> {
             publisherId: publisher.id,
         });
     }
+}
+
+async function seedFilterableGames(db: Database): Promise<void> {
+    const [strategy] = await db
+        .insert(categories)
+        .values({ name: 'Strategy', description: 'strategy' })
+        .returning({ id: categories.id });
+    const [puzzle] = await db
+        .insert(categories)
+        .values({ name: 'Puzzle', description: 'puzzle' })
+        .returning({ id: categories.id });
+    const [codeForge] = await db
+        .insert(publishers)
+        .values({ name: 'CodeForge Studios', description: 'code forge' })
+        .returning({ id: publishers.id });
+    const [githubGames] = await db
+        .insert(publishers)
+        .values({ name: 'GitHub Games', description: 'github' })
+        .returning({ id: publishers.id });
+
+    await db.insert(games).values([
+        {
+            title: 'DevOps Dominion',
+            description: 'strategy game',
+            starRating: 4.2,
+            categoryId: strategy.id,
+            publisherId: codeForge.id,
+        },
+        {
+            title: 'Code Puzzle Chronicles',
+            description: 'puzzle game',
+            starRating: 4.4,
+            categoryId: puzzle.id,
+            publisherId: codeForge.id,
+        },
+        {
+            title: 'Server Siege',
+            description: 'strategy game',
+            starRating: 4.6,
+            categoryId: strategy.id,
+            publisherId: githubGames.id,
+        },
+    ]);
 }
 
 describe('games data-access helpers', () => {
@@ -62,5 +106,34 @@ describe('games data-access helpers', () => {
     it('returns null for a non-existent game', async () => {
         await seedGames(db, 2);
         expect(await getGameById(db, 99999)).toBeNull();
+    });
+
+    it('returns no games for an empty database', async () => {
+        expect(await getFilteredGames(db)).toEqual([]);
+    });
+
+    it('filters games by title, categories, and publisher together', async () => {
+        await seedFilterableGames(db);
+        const all = await getAllGames(db);
+        const codeForgeId = all.find((game) => game.publisher?.name === 'CodeForge Studios')?.publisher?.id;
+        const strategyId = all.find((game) => game.category?.name === 'Strategy')?.category?.id;
+
+        const filtered = await getFilteredGames(db, {
+            search: 'dominion',
+            categoryIds: [strategyId!],
+            publisherId: codeForgeId,
+        });
+
+        expect(filtered.map((game) => game.title)).toEqual(['DevOps Dominion']);
+    });
+
+    it('matches any selected category', async () => {
+        await seedFilterableGames(db);
+        const all = await getAllGames(db);
+        const categoryIds = [...new Set(all.map((game) => game.category?.id).filter((id): id is number => id !== undefined))];
+
+        const filtered = await getFilteredGames(db, { categoryIds });
+
+        expect(filtered).toHaveLength(3);
     });
 });
