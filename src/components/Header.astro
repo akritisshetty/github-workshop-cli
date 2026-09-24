@@ -2,7 +2,7 @@
 import Menu from '../assets/icons/menu.svg';
 ---
 
-<header class="bg-blue-500 dark:bg-blue-700 text-white p-4 shadow-md transition-colors duration-300">
+<header class="bg-blue-700 dark:bg-blue-800 text-white p-4 shadow-md transition-colors duration-300">
   <div class="container mx-auto flex justify-between items-center pl-4 pr-4">
     <div class="flex items-center">
       <div class="relative group">
@@ -18,6 +18,16 @@ import Menu from '../assets/icons/menu.svg';
       </div>
       <div class="text-xl font-bold"><a href="/" class="hover:underline">Tailspin Toys</a></div>
     </div>
+    <button
+      id="high-contrast-toggle"
+      type="button"
+      class="rounded px-3 py-2 text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-700"
+      aria-label="Enable high contrast mode"
+      aria-pressed="false"
+      data-testid="high-contrast-toggle"
+    >
+      High contrast
+    </button>
   </div>
 </header>
 
@@ -54,6 +64,27 @@ import Menu from '../assets/icons/menu.svg';
         menuToggle.setAttribute('aria-expanded', 'false');
         menuToggle.focus();
       }
+    });
+  }
+
+  const highContrastToggle = document.getElementById('high-contrast-toggle');
+
+  if (highContrastToggle) {
+    const isHighContrast = document.documentElement.classList.contains('high-contrast');
+    highContrastToggle.setAttribute('aria-pressed', String(isHighContrast));
+    highContrastToggle.setAttribute(
+      'aria-label',
+      isHighContrast ? 'Disable high contrast mode' : 'Enable high contrast mode',
+    );
+
+    highContrastToggle.addEventListener('click', () => {
+      const enabled = document.documentElement.classList.toggle('high-contrast');
+      window.localStorage.setItem('tailspin-high-contrast', String(enabled));
+      highContrastToggle.setAttribute('aria-pressed', String(enabled));
+      highContrastToggle.setAttribute(
+        'aria-label',
+        enabled ? 'Disable high contrast mode' : 'Enable high contrast mode',
+      );
     });
   }
 </script>
